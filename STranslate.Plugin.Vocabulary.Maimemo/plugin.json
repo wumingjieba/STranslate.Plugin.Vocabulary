@@ -1,0 +1,10 @@
+﻿{
+  "PluginID": "131c6e4f431845e797d5c7c42ab9d60d",
+  "Name": "Maimemo",
+  "Description": "Maimemo Vocabulary plugin for stranslate",
+  "Author": "zggsong",
+  "Version": "1.0.0",
+  "Website": "https://github.com/STranslate/STranslate.Plugin.Vocabulary.Maimemo",
+  "ExecuteFileName": "STranslate.Plugin.Vocabulary.Maimemo.dll",
+  "IconPath": "icon.png"
+}
