@@ -4,7 +4,7 @@
   "Description": "将生词直接写入 D 盘的 plugin_words_for_app.txt 文件",
   "Author": "YourName",
   "Version": "1.0.0",
-  "Website": "https://github.com/STranslate/STranslate.Plugin.Vocabulary.Maimemo",
-  "ExecuteFileName": "STranslate.Plugin.Vocabulary.Maimemo.dll",
+  "Website": "https://github.com/wumingjieba/STranslate.Plugin.Vocabulary",
+  "ExecuteFileName": "STranslate.Plugin.Vocabulary.dll",
   "IconPath": "icon.png"
 }
