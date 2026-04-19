@@ -24,12 +24,12 @@ jobs:
           dotnet-version: "10.0.x"
 
       - name: Build
-        env:
-          REPO_NAME: ${{ github.event.repository.name }}
         shell: pwsh
         run: |
-          Write-Host "Repo name from github.event.repository.name: $env:REPO_NAME"
-          dotnet build ".\$env:REPO_NAME\$env:REPO_NAME.csproj" --configuration Release --no-incremental --force
+          # 自动寻找当前目录下所有的 .csproj 文件并执行编译
+          $projectFile = Get-ChildItem -Recurse -Filter *.csproj | Select-Object -First 1
+          Write-Host "Found project file: $($projectFile.FullName)"
+          dotnet build $($projectFile.FullName) --configuration Release --no-incremental --force
 
       - name: Upload Artifact  # 👈 核心修改 3：直接打包让你下载，不搞复杂的 Release
         uses: actions/upload-artifact@v4
