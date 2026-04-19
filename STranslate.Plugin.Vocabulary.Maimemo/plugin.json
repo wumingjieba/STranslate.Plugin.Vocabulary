@@ -5,6 +5,6 @@
   "Author": "YourName",
   "Version": "1.0.0",
   "Website": "https://github.com/wumingjieba/STranslate.Plugin.Vocabulary",
-  "ExecuteFileName": "STranslate.Plugin.Vocabulary.dll",
+  "ExecuteFileName": "STranslate.Plugin.Vocabulary.Maimemo.dll",
   "IconPath": "icon.png"
 }
