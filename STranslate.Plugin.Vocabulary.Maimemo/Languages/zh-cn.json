@@ -1,4 +1,4 @@
 {
-  "Name": "墨墨背单词",
-  "Description": "适用于STranslate的墨墨背单词插件"
+  "Name": "本地单词库",
+  "Description": "适用于STranslate的本地单词库插件，将生词直接写入 D 盘的 plugin_words_for_app.txt"
 }
