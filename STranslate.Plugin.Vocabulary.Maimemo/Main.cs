@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
 using STranslate.Plugin.Vocabulary.Maimemo.View;
 using STranslate.Plugin.Vocabulary.Maimemo.ViewModel;
-using System.Text.Json.Nodes;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Interop;
 
 namespace STranslate.Plugin.Vocabulary.Maimemo;
 
@@ -29,79 +31,41 @@ public class Main : IVocabularyPlugin
 
     public void Dispose() => _viewModel?.Dispose();
 
+    // 这里是核心：被改造后的保存逻辑
     public async Task<VocabularyResult> SaveAsync(string text, CancellationToken cancellationToken)
     {
         var result = new VocabularyResult();
         var startTime = DateTime.Now;
 
-        const string url = "https://open.maimemo.com/open/api/v1/notepads";
         try
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(Settings.BookID, "BookId不可为空");
-            var newUrl = $"{url}/{Settings.BookID}";
+            // 1. 你的“秘密路径”（请确保 D 盘有 TranslateHelper 这个文件夹）
+            string filePath = @"D:\TranslateHelper\plugin_words_for_app.txt";
+            
+            // 2. 清理单词并转小写
             var newText = text.ToLower().Trim();
 
-            var options = new Options
+            if (string.IsNullOrWhiteSpace(newText))
             {
-                Headers = new Dictionary<string, string>
-                {
-                    { "Authorization", $"Bearer {Settings.Token}" }
-                }
-            };
-
-            var resultJson = await Context.HttpService.GetAsync(newUrl, options, cancellationToken);
-            var resultList = GetResult(resultJson);
-
-            if (resultList.Contains(newText))
-            {
-                var msg = $"{Context.MetaData.Name}生词本 {Settings.BookName}({Settings.BookID}) 已存在单词: {newText}";
-                Context.Notification.Show("STranslate", msg);
-                Context.Logger.LogInformation(msg);
-                return result.Fail(resultJson);
-            }
-            else
-            {
-                resultList.Add(newText);
+                return result.Fail("单词为空");
             }
 
-            var content = new
-            {
-                notepad = new
-                {
-                    status = "PUBLISHED",
-                    content = string.Join(",", resultList),
-                    title = Settings.BookName,
-                    brief = "create by stranslate",
-                    tags = new[] { "其他" }
-                }
-            };
+            // 3. 准备写入的内容（单词 + 换行符）
+            string content = newText + Environment.NewLine;
 
-            var resp = await Context.HttpService.PostAsync(newUrl, content, options, cancellationToken);
-            if (!GetFinalResult(resp))
-            {
-                var msg = $"{Context.MetaData.Name}保存至生词本{Settings.BookName}({Settings.BookID})失败, Raw: {resp}";
+            // 4. 异步追加写入本地文件 (文件不存在会自动创建)
+            await File.AppendAllTextAsync(filePath, content, cancellationToken);
 
-                Context.Notification.Show("STranslate", msg);
-                Context.Logger.LogInformation(msg);
-                return result.Fail(resp);
-            }
-
-            // 二次检查结果是否真的插入了
-            resultJson = await Context.HttpService.GetAsync(newUrl, options, cancellationToken);
-            resultList = GetResult(resultJson);
-
-            if (!resultList.Contains(newText))
-            {
-                var msg = $"{Context.MetaData.Name}保存至生词本{Settings.BookName}({Settings.BookID})失败, 原因是二次检查时发现服务不接受该单词: {newText}";
-                Context.Notification.Show("STranslate", msg);
-                Context.Logger.LogInformation(msg);
-                return result.Fail(resultJson);
-            }
+            // 5. 写入成功后，在屏幕右下角弹个绿色的提示
+            Context.Notification.Show("STranslate", $"已成功写入本地: {newText}");
+            Context.Logger.LogInformation($"本地生词写入成功: {newText}");
+            
             return result;
         }
         catch (Exception ex)
         {
-            var msg = $"{Context.MetaData.Name}保存至生词本{Settings.BookName}({Settings.BookID})失败, 请检查配置保存后重试\n错误信息: {ex.Message}";
+            // 如果出错（比如文件被占用、没权限），直接报错
+            var msg = $"写入本地文件失败: {ex.Message}";
             Context.Notification.Show("STranslate", msg);
             Context.Logger.LogInformation(msg);
             return result.Fail(ex.Message);
@@ -110,34 +74,5 @@ public class Main : IVocabularyPlugin
         {
             result.Duration = DateTime.Now - startTime;
         }
-    }
-
-    private static bool GetFinalResult(string json)
-    {
-        var jObject = JsonNode.Parse(json);
-        if (jObject?["success"]?.ToString() != "true")
-            throw new Exception($"接口回复: {json}");
-
-        return true;
-    }
-
-    public static List<string> GetResult(string json)
-    {
-        var jObject = JsonNode.Parse(json);
-        var resultList = new List<string>();
-        if (jObject?["data"]?["notepad"]?["list"] is JsonArray array)
-        {
-            foreach (var item in array)
-            {
-                if (item is not JsonNode obj) continue;
-                if (obj["type"]?.ToString() == "WORD")
-                {
-                    if (obj["word"]?.ToString() is string str && !string.IsNullOrWhiteSpace(str))
-                        resultList.Add(str);
-                }
-            }
-        }
-
-        return resultList;
     }
 }
