@@ -14,70 +14,21 @@
     mc:Ignorable="d">
 
     <ikw:SimpleStackPanel Spacing="12">
+        
         <ui:SettingsCard Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookName}" Description="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_Description}">
             <ui:SettingsCard.HeaderIcon>
                 <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Folder_20_Regular}" />
             </ui:SettingsCard.HeaderIcon>
             
             <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox MinWidth="360" IsReadOnly="True" Text="{Binding FilePath}" ui:ControlHelper.PlaceholderText="请选择保存路径..." />
+                <TextBox
+                    MinWidth="360"
+                    Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" 
+                    ui:ControlHelper.PlaceholderText="请手动输入或点击右侧选择..." />
+                
                 <Button Content="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_BtnContent}" Command="{Binding SelectPathCommand}" />
             </ikw:SimpleStackPanel>
         </ui:SettingsCard>
-
-        <ui:SettingsCard Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_Token}">
-            <ui:SettingsCard.HeaderIcon>
-                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Password_20_Regular}" />
-            </ui:SettingsCard.HeaderIcon>
-            <PasswordBox
-                MinWidth="300"
-                plugin:PasswordBoxAssistant.Attach="True"
-                plugin:PasswordBoxAssistant.Password="{Binding Token}" />
-        </ui:SettingsCard>
-
-        <ui:SettingsExpander
-            Description="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_Description}"
-            Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID}"
-            IsExpanded="True">
-            <ui:SettingsExpander.HeaderIcon>
-                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.NumberCircle0_20_Regular}" />
-            </ui:SettingsExpander.HeaderIcon>
-            <Button Command="{Binding CheckCommand}">
-                <ui:IconAndText Content="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_BtnContent}" Icon="{DynamicResource {x:Static ui:FluentSystemIcons.BranchRequest_20_Regular}}" />
-            </Button>
-
-            <ui:SettingsExpander.Items>
-                <ui:SettingsCard>
-                    <ui:SettingsCard.Header>
-                        <TextBox
-                            MinWidth="300"
-                            IsReadOnly="True"
-                            Text="{Binding BookID}"
-                            TextWrapping="Wrap" />
-                    </ui:SettingsCard.Header>
-                </ui:SettingsCard>
-
-                <ui:SettingsCard>
-                    <ui:SettingsCard.Style>
-                        <Style BasedOn="{StaticResource {x:Type ui:SettingsCard}}" TargetType="ui:SettingsCard">
-                            <Setter Property="Visibility" Value="Visible" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ErrorMessage}" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:SettingsCard.Style>
-                    <ui:SettingsCard.Header>
-                        <TextBlock
-                            MinWidth="300"
-                            Foreground="Red"
-                            Text="{Binding ErrorMessage}"
-                            TextWrapping="WrapWithOverflow" />
-                    </ui:SettingsCard.Header>
-                </ui:SettingsCard>
-            </ui:SettingsExpander.Items>
-        </ui:SettingsExpander>
 
         <ui:SettingsCard Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_Info}">
             <ui:SettingsCard.HeaderIcon>
@@ -85,5 +36,6 @@
             </ui:SettingsCard.HeaderIcon>
             <TextBlock Text="{DynamicResource STranslate_Plugin_Translate_Maimemo_Info_Content}" TextWrapping="Wrap" />
         </ui:SettingsCard>
+
     </ikw:SimpleStackPanel>
 </UserControl>
