@@ -1,6 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input; // 必须有这个，否则 [RelayCommand] 无效
-using Microsoft.Win32; // 必须有这个，否则找不到 SaveFileDialog
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
+using System.ComponentModel;
+using System;
 
 namespace STranslate.Plugin.Vocabulary.Maimemo.ViewModel;
 
@@ -13,12 +16,14 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     {
         _context = context;
         _settings = settings;
-        // 初始化界面显示的路径
+
+        // 初始化读取路径
         FilePath = _settings.FilePath;
+
         PropertyChanged += OnSettingsViewModelPropertyChanged;
     }
 
-    private void OnSettingsViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnSettingsViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(FilePath))
         {
@@ -27,14 +32,15 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
     }
 
-    [ObservableProperty] public partial string FilePath { get; set; }
+    public void Dispose() => PropertyChanged -= OnSettingsViewModelPropertyChanged;
 
-    // --- 核心：增加选择文件命令 ---
+    [ObservableProperty] 
+    public partial string FilePath { get; set; }
+
     [RelayCommand]
     private void SelectPath()
     {
-        // 调起 Windows 系统的文件选择/保存框
-        var dialog = new Microsoft.Win32.SaveFileDialog
+        var dialog = new SaveFileDialog
         {
             Filter = "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*",
             Title = "选择或创建你的生词本文件"
@@ -42,10 +48,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
         if (dialog.ShowDialog() == true)
         {
-            // 将选中的路径同步回输入框
             FilePath = dialog.FileName;
         }
     }
-} // 确保类闭合
-    public void Dispose() => PropertyChanged -= OnSettingsViewModelPropertyChanged;
 }
