@@ -2,9 +2,9 @@ namespace STranslate.Plugin.Vocabulary.Maimemo;
 
 public class Settings
 {
-    public string BookID { get; set; } = string.Empty;
-
-    public string BookName { get; set;} = string.Empty;
-
-    public string Token { get; set;} = string.Empty;
+    // 将原有的 BookName 改名为 FilePath，或者直接新增一个
+    public string FilePath { get; set; } = @"D:\TranslateHelper\words_for_app.txt";
+    
+    // 其他不用的字段（Token, BookID）可以留着不理，也可以删掉
+    public string Token { get; set; } = string.Empty;
 }

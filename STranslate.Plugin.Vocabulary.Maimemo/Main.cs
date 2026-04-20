@@ -40,7 +40,7 @@ public class Main : IVocabularyPlugin
         try
         {
             // 1. 你的“秘密路径”（请确保 D 盘有 TranslateHelper 这个文件夹）
-            string filePath = @"D:\MyCode\TranslateHelper\plugin_words_for_app.txt";
+            string filePath = Settings.FilePath; // 从设置里读取用户选的路径
             
             // 2. 清理单词并转小写
             var newText = text.ToLower().Trim();

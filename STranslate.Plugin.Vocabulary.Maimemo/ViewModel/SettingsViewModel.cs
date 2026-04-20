@@ -1,8 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
-using System.ComponentModel;
-using System.Text.Json.Nodes;
+using Microsoft.Win32; // 必须引用这个来调用系统文件窗口
 
 namespace STranslate.Plugin.Vocabulary.Maimemo.ViewModel;
 
@@ -15,114 +13,37 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     {
         _context = context;
         _settings = settings;
-
-        BookName = _settings.BookName;
-        BookID = _settings.BookID;
-        Token = _settings.Token;
-
+        // 初始化界面显示的路径
+        FilePath = _settings.FilePath;
         PropertyChanged += OnSettingsViewModelPropertyChanged;
     }
 
-    private void OnSettingsViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnSettingsViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
+        if (e.PropertyName == nameof(FilePath))
         {
-            case nameof(BookName):
-                _settings.BookName = BookName;
-                break;
-                case nameof(BookID):
-                    _settings.BookID = BookID;
-                break;
-                case nameof(Token):
-                    _settings.Token = Token;
-                break;
-            default:
-                break;
+            _settings.FilePath = FilePath;
+            _context.SaveSettingStorage<Settings>();
         }
+    }
 
-        _context.SaveSettingStorage<Settings>();
+    [ObservableProperty] public partial string FilePath { get; set; }
+
+    // --- 核心：增加选择文件命令 ---
+    [RelayCommand]
+    private void SelectPath()
+    {
+        var openFileDialog = new SaveFileDialog // 用 SaveFileDialog 可以方便创建新文件
+        {
+            Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+            Title = "选择或创建你的生词本文件"
+        };
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            FilePath = openFileDialog.FileName;
+        }
     }
 
     public void Dispose() => PropertyChanged -= OnSettingsViewModelPropertyChanged;
-
-    [ObservableProperty] public partial string BookName { get; set;  }
-    [ObservableProperty] public partial string BookID { get; set;  }
-    [ObservableProperty] public partial string Token { get; set;  }
-    [ObservableProperty] public partial string ErrorMessage { get; set; } = string.Empty;
-
-
-    [RelayCommand(IncludeCancelCommand = true)]
-    private async Task<bool> CheckAsync(CancellationToken cancellationToken)
-    {
-        ErrorMessage = string.Empty;
-        BookID = string.Empty;
-
-        const string url = "https://open.maimemo.com/open/api/v1/notepads";
-        try
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(_settings.BookName, $"生词本服务: {_context.MetaData.Name} 中生词本名称为空");
-
-            var options = new Options
-            {
-                Headers = new Dictionary<string, string>
-                {
-                    { "Authorization", $"Bearer {_settings.Token}" }
-                }
-            };
-            var bookList = await _context.HttpService.GetAsync(url, options, cancellationToken);
-            var bookId = GetIdByNameInArray(bookList, _settings.BookName);
-            if (string.IsNullOrWhiteSpace(bookId))
-            {
-                var content = new
-                {
-                    notepad = new
-                    {
-                        status = "PUBLISHED",
-                        content = "first",
-                        title = _settings.BookName,
-                        brief = "create by stranslate",
-                        tags = new[] { "其他" }
-                    }
-                };
-                var resp = await _context.HttpService.PostAsync(url, content, options, cancellationToken);
-                bookId = GetIdByName(resp);
-                ArgumentException.ThrowIfNullOrWhiteSpace(bookId,
-                    $"创建生词本服务: {_context.MetaData.Name}->生词本名称: {_settings.BookName} 失败, 接口回复: {resp}");
-            }
-            _context.Snackbar.ShowSuccess("获取成功");
-            BookID = bookId;
-            ErrorMessage = string.Empty;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _context.Snackbar.ShowError("获取失败");
-            var msg = $"检查生词本服务： {_context.MetaData.Name} 配置失败, {ex.Message}";
-            ErrorMessage = msg;
-            _context.Logger.LogError(msg);
-            return false;
-        }
-    }
-
-    private static string GetIdByName(string json)
-    {
-        var jObject = JsonNode.Parse(json);
-        return jObject?["data"]?["notepad"]?["id"]?.ToString() ?? string.Empty;
-    }
-
-    private static string GetIdByNameInArray(string json, string name)
-    {
-        var jObject = JsonNode.Parse(json);
-        if (jObject?["data"]?["notepads"] is not JsonArray jArray) return string.Empty;
-
-        foreach (var jToken in jArray)
-        {
-            if (jToken is not JsonNode item) continue;
-
-            if (item["title"]?.ToString() == name)
-                return item["id"]?.ToString() ?? string.Empty;
-        }
-
-        return string.Empty;
-    }
 }

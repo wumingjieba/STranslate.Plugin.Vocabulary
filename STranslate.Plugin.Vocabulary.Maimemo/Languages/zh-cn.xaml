@@ -3,12 +3,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookName">生词本</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Token">Token</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID">获取生词本ID</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID_Description">若未获取到生词本ID则无法正常保存单词到生词本</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID_BtnContent">获取</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Info">说明</sys:String>
-    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Info_Content">保存生词到墨墨背单词生词本上。</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookName">本地存储路径</sys:String>
+    
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Token">状态说明</sys:String>
+    
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID">插件运行状态</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID_Description">插件将以追加模式写入单词，确保文件路径有效即可正常工作</sys:String>
+    
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_BookID_BtnContent">选择文件</sys:String>
+    
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Info">本地同步说明</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Maimemo_Info_Content">当前已切换为本地存储模式。翻译结果将直接追加到你指定的 .txt 文件末尾，无需网络连接。</sys:String>
 
 </ResourceDictionary>
