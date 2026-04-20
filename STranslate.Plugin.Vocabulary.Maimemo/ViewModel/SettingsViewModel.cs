@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32; // 必须引用这个来调用系统文件窗口
+using CommunityToolkit.Mvvm.Input; // 必须有这个，否则 [RelayCommand] 无效
+using Microsoft.Win32; // 必须有这个，否则找不到 SaveFileDialog
 
 namespace STranslate.Plugin.Vocabulary.Maimemo.ViewModel;
 

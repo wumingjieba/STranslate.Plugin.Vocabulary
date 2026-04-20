@@ -14,14 +14,15 @@
     mc:Ignorable="d">
 
     <ikw:SimpleStackPanel Spacing="12">
-        <ui:SettingsCard Header="本地生词本路径" Description="插件将单词追加到该文件末尾">
+        <ui:SettingsCard Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookName}" Description="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_Description}">
             <ui:SettingsCard.HeaderIcon>
                 <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Folder_20_Regular}" />
             </ui:SettingsCard.HeaderIcon>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox MinWidth="300" IsReadOnly="True" Text="{Binding FilePath}" />
-                <Button Content="选择文件" Command="{Binding SelectPathCommand}" />
-            </StackPanel>
+            
+            <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox MinWidth="360" IsReadOnly="True" Text="{Binding FilePath}" ui:ControlHelper.PlaceholderText="请选择保存路径..." />
+                <Button Content="{DynamicResource STranslate_Plugin_Translate_Maimemo_BookID_BtnContent}" Command="{Binding SelectPathCommand}" />
+            </ikw:SimpleStackPanel>
         </ui:SettingsCard>
 
         <ui:SettingsCard Header="{DynamicResource STranslate_Plugin_Translate_Maimemo_Token}">
