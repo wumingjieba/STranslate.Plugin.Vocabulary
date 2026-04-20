@@ -33,17 +33,19 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void SelectPath()
     {
-        var openFileDialog = new SaveFileDialog // 用 SaveFileDialog 可以方便创建新文件
+        // 调起 Windows 系统的文件选择/保存框
+        var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+            Filter = "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*",
             Title = "选择或创建你的生词本文件"
         };
 
-        if (openFileDialog.ShowDialog() == true)
+        if (dialog.ShowDialog() == true)
         {
-            FilePath = openFileDialog.FileName;
+            // 将选中的路径同步回输入框
+            FilePath = dialog.FileName;
         }
     }
-
+} // 确保类闭合
     public void Dispose() => PropertyChanged -= OnSettingsViewModelPropertyChanged;
 }
